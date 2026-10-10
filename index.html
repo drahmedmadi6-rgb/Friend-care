@@ -6,86 +6,66 @@
     <title>عيادات الأصدقاء التخصصية - استقبال الأطفال</title>
     
     <!-- الخطوط والأيقونات -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     
+    <!-- مكتبة التقويم العربي (Flatpickr) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
+
     <style>
         /* =========================================================
            1. المتغيرات والألوان (Medical UI Colors)
            ========================================================= */
         :root {
-            /* الألوان الرئيسية */
-            --primary: #1d4ed8;       /* أزرق طبي احترافي */
+            --primary: #1d4ed8;
             --primary-hover: #1e3a8a;
-            --secondary: #eff6ff;     /* أزرق فاتح جداً للخلفيات */
-            
-            /* ألوان الأزرار والوظائف */
-            --success: #10b981;       /* أخضر (للحجز) */
+            --secondary: #eff6ff;
+            --success: #10b981;
             --success-light: #ecfdf5;
-            --accent: #8b5cf6;        /* بنفسجي (للتواصل) */
+            --accent: #8b5cf6;
             --accent-light: #f5f3ff;
             --danger: #ef4444;
             --warning: #f59e0b;
-            
-            /* ألوان النصوص والخلفيات */
-            --bg-color: #f8fafc;      /* لون خلفية هادئ ومريح للعين */
+            --bg-color: #f8fafc;
             --surface: #ffffff;
             --text-dark: #0f172a;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
-            
-            /* ألوان القائمة الجانبية للسكرتارية */
             --sidebar-bg: #ffffff;
             --sidebar-text: #475569;
             --sidebar-active: #eff6ff;
-            
-            /* الظلال الناعمة الفخمة (Glassmorphism touches) */
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             --shadow-card: 0 10px 25px -5px rgba(37, 99, 235, 0.05);
         }
 
-        /* =========================================================
-           2. إعادة الضبط الأساسية (Reset & Base)
-           ========================================================= */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-dark); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
-        /* =========================================================
-           3. التخطيط الرئيسي المتجاوب (Mobile First Layout)
-           ========================================================= */
         .app-container { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; margin-bottom: 70px; /* لترك مساحة للقائمة السفلية */ }
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; margin-bottom: 70px; }
         .content-wrapper { flex: 1; padding: 15px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
         
         .page-section { display: none; animation: fadeIn 0.4s ease; }
         .page-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* =========================================================
-           4. الهيدر والقائمة (Header & Navigation)
-           ========================================================= */
-        /* الهيدر العلوي */
         .top-header { background: var(--surface); padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm); z-index: 10; position: sticky; top: 0;}
         .top-header h2 { font-size: 1.2rem; color: var(--text-dark); font-weight: 800; }
         .user-info { display: flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 700; font-size: 0.9rem;}
         .user-info i { font-size: 1.4rem; }
 
-        /* القائمة السفلية للموبايل (Bottom Navigation) */
         .sidebar { width: 100%; height: 70px; background: var(--surface); position: fixed; bottom: 0; left: 0; display: flex; flex-direction: row; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); z-index: 1000; padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid var(--border-color); }
-        .brand { display: none; } /* مخفية في الموبايل */
+        .brand { display: none; }
         .nav-menu { display: flex; flex-direction: row; width: 100%; justify-content: space-around; align-items: center; }
         .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; color: var(--sidebar-text); text-decoration: none; font-size: 0.75rem; font-weight: 600; padding: 10px 0; transition: 0.3s; border-top: 3px solid transparent; }
         .nav-link i { font-size: 1.3rem; }
         .nav-link.active { color: var(--primary); border-top-color: var(--primary); }
 
-        /* =========================================================
-           5. شاشة الاستقبال الرئيسية (Welcome Home Screen)
-           ========================================================= */
         .welcome-banner { text-align: center; padding: 35px 20px; background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%); border-radius: 24px; margin-bottom: 25px; box-shadow: var(--shadow-card); border: 1px solid #dbeafe; position: relative; overflow: hidden; }
         .clinic-logo i { font-size: 3.5rem; color: var(--primary); margin-bottom: 15px; }
         .clinic-title { font-size: 1.6rem; color: #1e3a8a; font-weight: 800; margin-bottom: 10px; line-height: 1.3; }
@@ -93,27 +73,18 @@
         .doctor-subtitle span { font-size: 0.95rem; color: #3b82f6; font-weight: 500; display: block; margin-top: 5px; }
         
         .action-cards-container { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 30px; }
-        
         .action-card { padding: 25px 20px; border-radius: 20px; text-align: center; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; border: 1px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; }
         .action-card:active { transform: scale(0.98); }
-        
-        /* كارت حجز جديد */
         .card-green { background: var(--success-light); border-color: #a7f3d0; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.1); }
         .card-green .card-icon { color: var(--success); }
-        
-        /* كارت متابعة حجز */
         .card-blue { background: var(--secondary); border-color: #bfdbfe; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.1); }
         .card-blue .card-icon { color: var(--primary); }
-        
-        /* كارت التواصل */
         .card-purple { background: var(--accent-light); border-color: #ddd6fe; box-shadow: 0 8px 20px rgba(139, 92, 246, 0.1); }
         .card-purple .card-icon { color: var(--accent); }
-        
         .card-icon { font-size: 2.5rem; margin-bottom: 15px; transition: transform 0.3s; }
         .action-card h3 { font-size: 1.25rem; color: var(--text-dark); margin-bottom: 8px; font-weight: 800; }
         .action-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; font-weight: 500;}
 
-        /* إحصائيات الإدارة (تظهر أسفل الكروت) */
         .admin-stats-container { border-top: 2px dashed var(--border-color); padding-top: 25px; margin-top: 10px; }
         .admin-stats-title { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 15px; font-weight: 700; text-align: center; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -122,9 +93,6 @@
         .stat-info h3 { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px; font-weight: 600; }
         .stat-info p { font-size: 1.5rem; font-weight: 800; color: var(--text-dark); line-height: 1; }
 
-        /* =========================================================
-           6. عناصر النماذج والبطاقات الداخلية (Forms & Cards)
-           ========================================================= */
         .card { background: var(--surface); border-radius: 16px; box-shadow: var(--shadow-card); border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 20px; }
         .card-header { padding: 20px; border-bottom: 1px solid var(--border-color); background: #f8fafc; }
         .card-header h3 { font-size: 1.15rem; color: var(--text-dark); font-weight: 800; }
@@ -139,16 +107,12 @@
         input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.1); }
         input[readonly] { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; border-style: dashed; }
 
-        /* تعديل أزرار الراديو للموبايل */
         .radio-group { display: flex; flex-direction: column; gap: 15px; background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); }
         .radio-group label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; font-size: 0.95rem; margin: 0; }
         .radio-group input[type="radio"] { width: 22px; height: 22px; accent-color: var(--primary); }
 
         .search-box { display: flex; flex-direction: column; gap: 12px; }
         
-        /* =========================================================
-           7. الأزرار (Buttons)
-           ========================================================= */
         button { border: none; cursor: pointer; font-family: inherit; font-weight: 700; transition: all 0.2s ease; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
         button:active { transform: scale(0.98); }
         .btn-primary { background: var(--primary); color: white; padding: 14px 20px; font-size: 1.05rem; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2); width: 100%; }
@@ -161,9 +125,6 @@
         
         .btn-small { padding: 8px 15px; font-size: 0.85rem; border-radius: 8px; width: auto; }
 
-        /* =========================================================
-           8. الجداول المتجاوبة (Responsive Tables)
-           ========================================================= */
         .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; border: 1px solid var(--border-color); }
         .data-table { width: 100%; border-collapse: collapse; white-space: nowrap; min-width: 600px; }
         .data-table th, .data-table td { padding: 15px; text-align: right; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; }
@@ -178,9 +139,6 @@
         .badge.cancelled { background: #fee2e2; color: #b91c1c; }
         .badge.scheduled { background: #f1f5f9; color: #475569; }
 
-        /* =========================================================
-           9. النوافذ المنبثقة وأدوات المساعدة (Modals & Utilities)
-           ========================================================= */
         .hidden { display: none !important; }
         .mt-10 { margin-top: 10px; } .mt-20 { margin-top: 20px; }
         
@@ -202,14 +160,9 @@
         .close-modal { position: absolute; left: 20px; top: 20px; font-size: 1.8rem; cursor: pointer; color: var(--text-muted); transition: 0.2s; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--bg-color); border-radius: 50%; }
         .close-modal:active { background: #e2e8f0; }
 
-        /* =========================================================
-           10. دعم شاشات الكمبيوتر والتابلت (Desktop Scaling)
-           ========================================================= */
         @media (min-width: 768px) {
             .app-container { flex-direction: row; }
             .main-content { margin-bottom: 0; }
-            
-            /* إظهار القائمة الجانبية للكمبيوتر */
             .sidebar { width: 280px; height: 100vh; position: relative; flex-direction: column; border-top: none; border-left: 1px solid var(--border-color); }
             .brand { display: block; padding: 30px 20px; border-bottom: 1px solid var(--border-color); text-align: center; background: var(--surface); }
             .brand h1 { font-size: 1.4rem; color: var(--primary); margin-bottom: 5px; font-weight: 800;}
@@ -217,8 +170,6 @@
             .nav-menu { flex-direction: column; justify-content: flex-start; padding: 20px 0; }
             .nav-link { flex-direction: row; justify-content: flex-start; padding: 15px 25px; gap: 15px; font-size: 1rem; border-top: none; border-right: 4px solid transparent; }
             .nav-link.active { border-top-color: transparent; border-right-color: var(--primary); background: var(--secondary); }
-            
-            /* تنظيم المحتوى */
             .content-wrapper { padding: 40px; }
             .top-header { padding: 20px 40px; }
             .top-header h2 { font-size: 1.5rem; }
@@ -231,23 +182,16 @@
             .card-header, .card-body { padding: 30px; }
         }
     </style>
-    <!-- مكتبة التقويم العربي (Flatpickr) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
 </head>
 <body>
-    <!-- شاشة التحميل -->
     <div id="loadingOverlay" class="loading-overlay hidden">
         <div class="spinner"></div>
         <p id="loadingText" style="font-weight: 700; color: var(--primary); font-size: 1.1rem;">جاري التحميل...</p>
     </div>
 
-    <!-- رسائل التنبيه -->
     <div id="toast" class="toast hidden"></div>
 
     <div class="app-container">
-        <!-- القائمة الجانبية (شريط سفلي في الموبايل) -->
         <aside class="sidebar">
             <div class="brand">
                 <h1>عيادات الأصدقاء</h1>
@@ -257,12 +201,10 @@
                 <a href="#" class="nav-link active" data-target="homeSection"><i class="fa-solid fa-house-medical"></i> <span>الرئيسية</span></a>
                 <a href="#" class="nav-link" data-target="newAppointmentSection"><i class="fa-solid fa-calendar-plus"></i> <span>حجز جديد</span></a>
                 <a href="#" class="nav-link" data-target="searchPatientSection"><i class="fa-solid fa-file-medical"></i> <span>متابعة حجز</span></a>
-                <!-- زر الإدارة للسكرتارية -->
                 <a href="#" class="nav-link" data-target="todayAppointmentsSection"><i class="fa-solid fa-list-check"></i> <span>سجل اليوم</span></a>
             </nav>
         </aside>
 
-        <!-- المحتوى الرئيسي -->
         <main class="main-content">
             <header class="top-header">
                 <h2 id="pageTitle">الرئيسية</h2>
@@ -274,43 +216,33 @@
 
             <div class="content-wrapper">
                 
-                <!-- ==========================================
-                     القسم الأول: شاشة الاستقبال الرئيسية (Welcome Home)
-                     ========================================== -->
                 <section id="homeSection" class="page-section active">
-                    
-                    <!-- اللافتة الترحيبية -->
                     <div class="welcome-banner">
                         <div class="clinic-logo"><i class="fa-solid fa-hospital-user"></i></div>
                         <h1 class="clinic-title">عيادات الأصدقاء التخصصية</h1>
                         <h2 class="doctor-subtitle">د. أحمد ماضي<br><span>طبيب الأطفال وحديثي الولادة</span></h2>
                     </div>
 
-                    <!-- كروت الخدمات الرئيسية -->
                     <div class="action-cards-container">
-                        <!-- 1. حجز جديد -->
                         <div class="action-card card-green" onclick="document.querySelector('[data-target=\'newAppointmentSection\']').click()">
                             <div class="card-icon"><i class="fa-solid fa-calendar-check"></i></div>
                             <h3>حجز جديد</h3>
                             <p>تسجيل بيانات طفلك لطلب موعد كشف جديد بالعيادة بسهولة</p>
                         </div>
 
-                        <!-- 2. متابعة حجز -->
                         <div class="action-card card-blue" onclick="document.querySelector('[data-target=\'searchPatientSection\']').click()">
                             <div class="card-icon"><i class="fa-solid fa-laptop-medical"></i></div>
                             <h3>متابعة حجز</h3>
                             <p>الاستعلام عن حالة الحجز الحالي أو استعراض السجل الطبي</p>
                         </div>
 
-                        <!-- 3. التواصل مع العيادة -->
-                        <div class="action-card card-purple" onclick="openContactModal()">
+                        <div class="action-card card-purple" onclick="window.openContactModal()">
                             <div class="card-icon"><i class="fa-solid fa-headset"></i></div>
                             <h3>التواصل مع العيادة</h3>
                             <p>أرقام الهواتف، العنوان، ومواعيد العمل الرسمية للمجمع</p>
                         </div>
                     </div>
 
-                    <!-- إحصائيات الإدارة (تظهر في الأسفل للسكرتارية) -->
                     <div class="admin-stats-container">
                         <h3 class="admin-stats-title">نظرة عامة على العيادة اليوم</h3>
                         <div class="stats-grid">
@@ -332,9 +264,6 @@
                     </div>
                 </section>
 
-                <!-- ==========================================
-                     القسم الثاني: حجز جديد
-                     ========================================== -->
                 <section id="newAppointmentSection" class="page-section hidden">
                     <div class="card">
                         <div class="card-header">
@@ -412,9 +341,6 @@
                     </div>
                 </section>
 
-                <!-- ==========================================
-                     القسم الثالث: متابعة الحجز (Search / Track)
-                     ========================================== -->
                 <section id="searchPatientSection" class="page-section hidden">
                     <div class="card">
                         <div class="card-header">
@@ -428,12 +354,8 @@
                             </div>
                         </div>
                     </div>
-                    <!-- تظهر نتائج البحث في الـ Modal الخاص بالمريض -->
                 </section>
 
-                <!-- ==========================================
-                     القسم الرابع: سجل كشوفات اليوم (للسكرتارية)
-                     ========================================== -->
                 <section id="todayAppointmentsSection" class="page-section hidden">
                     <div class="card">
                         <div class="card-header" style="display: flex; flex-direction: column; gap: 15px;">
@@ -460,7 +382,6 @@
                     </div>
                 </section>
 
-                <!-- القسم الخامس: المواعيد المجدولة (مخفي من القائمة السفلية لكن متاح برمجياً) -->
                 <section id="upcomingAppointmentsSection" class="page-section hidden">
                     <div class="card">
                         <div class="card-header">
@@ -480,14 +401,10 @@
         </main>
     </div>
 
-    <!-- ==========================================
-         النوافذ المنبثقة (Modals)
-         ========================================== -->
-    
-    <!-- 1. نافذة التواصل مع العيادة -->
+    <!-- Modals -->
     <div id="contactModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('contactModal')">&times;</span>
+            <span class="close-modal" onclick="window.closeModal('contactModal')">&times;</span>
             <div style="text-align: center; padding-top: 10px;">
                 <div style="background: var(--accent-light); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
                     <i class="fa-solid fa-headset" style="font-size: 2.5rem; color: var(--accent);"></i>
@@ -505,15 +422,14 @@
                     <span style="font-weight: 700; color: var(--text-dark); font-size: 1rem;">مجمع عيادات الأصدقاء - الشرقية</span>
                 </div>
                 
-                <button class="btn-primary mt-20" onclick="closeModal('contactModal')">إغلاق النافذة</button>
+                <button class="btn-primary mt-20" onclick="window.closeModal('contactModal')">إغلاق النافذة</button>
             </div>
         </div>
     </div>
 
-    <!-- 2. نافذة ملف المريض (تظهر بعد البحث) -->
     <div id="patientModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('patientModal')">&times;</span>
+            <span class="close-modal" onclick="window.closeModal('patientModal')">&times;</span>
             <h2 style="font-size: 1.3rem; margin-bottom: 20px; color: var(--text-dark); border-bottom: 2px solid var(--bg-color); padding-bottom: 15px;"><i class="fa-solid fa-folder-open text-primary"></i> السجل الطبي للمريض</h2>
             <div id="modalPatientInfo" class="form-grid"></div>
             
@@ -526,14 +442,13 @@
                     <tbody></tbody>
                 </table>
             </div>
-            <button class="btn-secondary mt-20" onclick="closeModal('patientModal')">إغلاق السجل</button>
+            <button class="btn-secondary mt-20" onclick="window.closeModal('patientModal')">إغلاق السجل</button>
         </div>
     </div>
 
-    <!-- 3. نافذة تحديث حالة الكشف (للسكرتارية) -->
     <div id="statusModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('statusModal')">&times;</span>
+            <span class="close-modal" onclick="window.closeModal('statusModal')">&times;</span>
             <h2 style="font-size: 1.3rem; margin-bottom: 20px;"><i class="fa-solid fa-pen-to-square text-primary"></i> تغيير حالة المريض</h2>
             <form id="statusForm">
                 <input type="hidden" id="statusAppId">
@@ -552,10 +467,6 @@
         </div>
     </div>
 
-    <!-- ==========================================
-         المنطق البرمجي (Firebase & App Logic)
-         لم يتم المساس بوظائفه
-         ========================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, where, doc, getDoc, updateDoc, deleteDoc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
@@ -574,7 +485,6 @@
         const COL_PATIENTS = "friends_patients";
         const COL_APPS = "friends_appointments";
 
-        // دوال التحكم في النوافذ المنبثقة (Modals) بطريقة حديثة
         window.openContactModal = () => {
             const modal = document.getElementById('contactModal');
             modal.classList.remove('hidden');
@@ -641,7 +551,7 @@
             }
             return `<span class="badge ${cssClass}">${status}</span>`;
         }
-        // حساب العمر الدقيق لطب الأطفال (سنوات، شهور، أيام)
+
         function getExactAge(dobString) {
             if (!dobString) return 'غير محدد';
             const birthDate = new Date(dobString);
@@ -694,28 +604,24 @@
         document.addEventListener("DOMContentLoaded", () => {
             let currentFormPatient = null;
 
-            // تفعيل اللغة العربية بشكل عام لجميع التقويمات
             if (typeof flatpickr !== 'undefined' && flatpickr.l10ns && flatpickr.l10ns.ar) {
                 flatpickr.localize(flatpickr.l10ns.ar);
             }
 
-            // إعدادات التقويم العربي الموحدة لجميع الحقول (لإجبار الموبايل على العربي)
             const commonDateOptions = {
                 locale: (typeof flatpickr !== 'undefined' && flatpickr.l10ns) ? flatpickr.l10ns.ar : "ar",
-                dateFormat: "Y-m-d",    // الصيغة البرمجية للحفظ
-                altInput: true,         // إظهار حقل بديل منسق للمستخدم
-                altFormat: "d/m/Y",     // صيغة العرض (يوم/شهر/سنة)
-                disableMobile: true,    // إلغاء تقويم الموبايل الافتراضي (الإنجليزي)
-                dir: "rtl"              // الاتجاه من اليمين لليسار
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d/m/Y",
+                disableMobile: true,
+                dir: "rtl"
             };
 
-            // تهيئة حقل تاريخ الميلاد (يسمح بتاريخ اليوم لحديثي الولادة ويمنع المستقبل)
             flatpickr("#formDOB", {
                 ...commonDateOptions,
                 maxDate: "today"
             });
 
-            // تهيئة حقول تواريخ الحجوزات
             flatpickr("#formAppDate", commonDateOptions);
             flatpickr("#filterUpcomingDate", commonDateOptions);
 
@@ -755,8 +661,14 @@
                         document.getElementById('formPhone').value = patient.phone;
                         document.getElementById('formGender').value = patient.gender;
                         document.getElementById('formGender').disabled = true;
-                        document.getElementById('formDOB').value = patient.dob;
-                        document.getElementById('formDOB').readOnly = true;
+                        
+                        const dobPicker = document.querySelector("#formDOB")._flatpickr;
+                        if(dobPicker) {
+                            dobPicker.setDate(patient.dob);
+                            // dobPicker.element.disabled = true; 
+                        } else {
+                            document.getElementById('formDOB').value = patient.dob;
+                        }
                     } else {
                         currentFormPatient = null;
                         resultDiv.className = "alert success mt-20";
@@ -766,7 +678,11 @@
                         document.getElementById('formPhone').value = phone;
                         document.getElementById('formFullName').readOnly = false;
                         document.getElementById('formGender').disabled = false;
-                        document.getElementById('formDOB').readOnly = false;
+                        
+                        const dobPicker = document.querySelector("#formDOB")._flatpickr;
+                        if(dobPicker) {
+                            dobPicker.clear();
+                        }
                     }
                 } catch (error) { showToast("خطأ في الاتصال بالشبكة", "error"); }
                 hideLoading();
@@ -822,14 +738,12 @@
                     document.getElementById('patientSearchResult').classList.add('hidden');
                     document.getElementById('checkPhoneInput').value = '';
                     
-                    // توجيه لصفحة البداية بعد الحجز
                     document.querySelector('[data-target="homeSection"]').click();
                 } catch (error) { showToast("خطأ أثناء حفظ الحجز", "error"); }
                 hideLoading();
             });
 
             async function loadDashboardData() {
-                // دمج وظيفة تحميل الإحصائيات (للرئيسية) وتحميل الجدول (لصفحة السكرتارية)
                 const isTodaySectionActive = !document.getElementById('todayAppointmentsSection').classList.contains('hidden');
                 if (isTodaySectionActive) showLoading("تحديث القائمة...");
                 
@@ -849,15 +763,13 @@
                         if(data.status === 'Waiting') waiting++;
                     });
                     
-                    // تحديث الإحصائيات في الصفحة الرئيسية
                     document.getElementById('dashTodayCount').innerText = total;
                     document.getElementById('dashWaitingCount').innerText = waiting;
 
-                    // رسم الجدول مع الترتيب الذكي (الانتظار أولاً، ثم المكتمل في النهاية)
                     apps.sort((a, b) => {
                         if (a.status === 'Completed' && b.status !== 'Completed') return 1;
                         if (a.status !== 'Completed' && b.status === 'Completed') return -1;
-                        return a.time.localeCompare(b.time); // ترتيب بالوقت لباقي الحالات
+                        return a.time.localeCompare(b.time); 
                     }).forEach(app => {
                         const isCompleted = app.status === 'Completed';
                         const rowStyle = isCompleted ? 'opacity: 0.6; background-color: #f8fafc;' : '';
@@ -940,7 +852,7 @@
                         updatedAt: serverTimestamp() 
                     });
                     showToast("تم تحديث الحالة بنجاح");
-                    closeModal('statusModal');
+                    window.closeModal('statusModal');
                     loadDashboardData();
                     if(!document.getElementById('upcomingAppointmentsSection').classList.contains('hidden')) loadUpcomingAppointments();
                 } catch(e) {}
@@ -986,44 +898,35 @@
                 } catch(e) {}
                 hideLoading();
             };
-            // وظيفة الحذف النهائي للمريض وجميع حجوزاته (لإزالة بيانات الاختبار)
+
             window.deletePatientCompletely = async (patientId) => {
                 const confirmMsg = "⚠️ تحذير خطير!\nهل أنت متأكد من حذف هذا المريض نهائياً؟\nسيؤدي هذا إلى حذف المريض وجميع حجوزاته المرتبطة ولن يمكنك التراجع.";
                 if (!confirm(confirmMsg)) return;
 
                 showLoading("جاري الحذف من قاعدة البيانات...");
                 try {
-                    // 1. تجميع كل حجوزات المريض
                     const qApps = query(collection(db, COL_APPS), where("patientId", "==", patientId));
                     const snapApps = await getDocs(qApps);
                     
-                    // 2. استخدام Promise.all لضمان انتظار انتهاء الحذف الفعلي من السيرفر
                     const deletePromises = [];
                     snapApps.forEach((appDoc) => {
                         deletePromises.push(deleteDoc(doc(db, COL_APPS, appDoc.id)));
                     });
                     await Promise.all(deletePromises);
 
-                    // 3. حذف ملف المريض الأساسي من السيرفر
                     await deleteDoc(doc(db, COL_PATIENTS, patientId));
 
                     showToast("تم الحذف بنجاح من النظام");
-                    closeModal('patientModal');
-                    loadDashboardData(); // تحديث الجدول فوراً
+                    window.closeModal('patientModal');
+                    loadDashboardData(); 
                 } catch (error) {
-                    // إظهار سبب المنع الحقيقي من فايربيز في رسالة تنبيه واضحة
-                    alert("فشل الحذف من السيرفر!
-السبب الفني: " + error.message + "
-
-(إذا كانت الرسالة تحتوي على permission denied فهذا يعني أن Firebase Rules تمنع الحذف ويجب تعديلها من لوحة تحكم فايربيز).");
+                    alert("فشل الحذف من السيرفر!\nالسبب الفني: " + error.message + "\n\n(إذا كانت الرسالة تحتوي على permission denied فهذا يعني أن Firebase Rules تمنع الحذف ويجب تعديلها من لوحة تحكم فايربيز).");
                     showToast("حدث خطأ في الاتصال بقاعدة البيانات", "error");
                     console.error("Delete Error:", error);
                 }
                 hideLoading();
             };
 
-
-            // تشغيل تهيئة الصفحة الرئيسية عند فتح الرابط
             loadDashboardData();
         });
     </script>
