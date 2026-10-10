@@ -6,7 +6,9 @@
     <title>عيادات الأصدقاء التخصصية - استقبال الأطفال</title>
     
     <!-- الخطوط والأيقونات -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -229,6 +231,10 @@
             .card-header, .card-body { padding: 30px; }
         }
     </style>
+    <!-- مكتبة التقويم العربي (Flatpickr) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
 </head>
 <body>
     <!-- شاشة التحميل -->
@@ -687,8 +693,36 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             let currentFormPatient = null;
-            // تقييد تقويم الموبايل لمنع اختيار تاريخ ميلاد في المستقبل
-            document.getElementById('formDOB').max = getTodayStr();
+
+            // إجبار التقويم على استخدام اللغة العربية وتفعيل التصميم المخصص
+            flatpickr.localize(flatpickr.l10ns.ar);
+            
+            // تهيئة حقل تاريخ الميلاد (يسمح بتاريخ اليوم لحديثي الولادة ويمنع المستقبل)
+            flatpickr("#formDOB", {
+                dateFormat: "Y-m-d", // للحفظ في قاعدة البيانات
+                altInput: true,
+                altFormat: "d/m/Y", // العرض للمستخدم (يوم/شهر/سنة)
+                maxDate: "today",
+                disableMobile: true, // إيقاف تقويم الموبايل الإنجليزي الإجباري
+                dir: "rtl"
+            });
+
+            // تهيئة حقول تواريخ الحجوزات
+            flatpickr("#formAppDate", {
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d/m/Y",
+                disableMobile: true,
+                dir: "rtl"
+            });
+
+            flatpickr("#filterUpcomingDate", {
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d/m/Y",
+                disableMobile: true,
+                dir: "rtl"
+            });
 
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.addEventListener('click', (e) => {
@@ -962,27 +996,32 @@
                 const confirmMsg = "⚠️ تحذير خطير!\nهل أنت متأكد من حذف هذا المريض نهائياً؟\nسيؤدي هذا إلى حذف المريض وجميع حجوزاته المرتبطة ولن يمكنك التراجع.";
                 if (!confirm(confirmMsg)) return;
 
-                showLoading("جاري الحذف النهائي...");
+                showLoading("جاري الحذف من قاعدة البيانات...");
                 try {
-                    // 1. البحث عن جميع حجوزات المريض وحذفها
+                    // 1. تجميع كل حجوزات المريض
                     const qApps = query(collection(db, COL_APPS), where("patientId", "==", patientId));
                     const snapApps = await getDocs(qApps);
-                    snapApps.forEach(async (appDoc) => {
-                        await deleteDoc(doc(db, COL_APPS, appDoc.id));
+                    
+                    // 2. استخدام Promise.all لضمان انتظار انتهاء الحذف الفعلي من السيرفر
+                    const deletePromises = [];
+                    snapApps.forEach((appDoc) => {
+                        deletePromises.push(deleteDoc(doc(db, COL_APPS, appDoc.id)));
                     });
+                    await Promise.all(deletePromises);
 
-                    // 2. حذف ملف المريض الأساسي
+                    // 3. حذف ملف المريض الأساسي من السيرفر
                     await deleteDoc(doc(db, COL_PATIENTS, patientId));
 
-                    showToast("تم حذف المريض وجميع سجلاته بنجاح");
+                    showToast("تم الحذف بنجاح من النظام");
                     closeModal('patientModal');
                     loadDashboardData(); // تحديث الجدول فوراً
                 } catch (error) {
-                    showToast("فشل الحذف، يرجى المحاولة لاحقاً", "error");
+                    showToast("حدث خطأ في الاتصال بقاعدة البيانات", "error");
                     console.error("Delete Error:", error);
                 }
                 hideLoading();
             };
+
 
             // تشغيل تهيئة الصفحة الرئيسية عند فتح الرابط
             loadDashboardData();
