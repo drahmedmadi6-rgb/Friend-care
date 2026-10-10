@@ -694,35 +694,25 @@
         document.addEventListener("DOMContentLoaded", () => {
             let currentFormPatient = null;
 
-            // إجبار التقويم على استخدام اللغة العربية وتفعيل التصميم المخصص
-            flatpickr.localize(flatpickr.l10ns.ar);
-            
+            // إعدادات التقويم العربي الموحدة لجميع الحقول (لإجبار الموبايل على العربي)
+            const commonDateOptions = {
+                locale: "ar",           // إجبار التقويم على اللغة العربية بشكل مباشر
+                dateFormat: "Y-m-d",    // الصيغة البرمجية للحفظ
+                altInput: true,         // إظهار حقل بديل منسق للمستخدم
+                altFormat: "d/m/Y",     // صيغة العرض (يوم/شهر/سنة)
+                disableMobile: true,    // إلغاء تقويم الموبايل الافتراضي (الإنجليزي)
+                dir: "rtl"              // الاتجاه من اليمين لليسار
+            };
+
             // تهيئة حقل تاريخ الميلاد (يسمح بتاريخ اليوم لحديثي الولادة ويمنع المستقبل)
             flatpickr("#formDOB", {
-                dateFormat: "Y-m-d", // للحفظ في قاعدة البيانات
-                altInput: true,
-                altFormat: "d/m/Y", // العرض للمستخدم (يوم/شهر/سنة)
-                maxDate: "today",
-                disableMobile: true, // إيقاف تقويم الموبايل الإنجليزي الإجباري
-                dir: "rtl"
+                ...commonDateOptions,
+                maxDate: "today"
             });
 
             // تهيئة حقول تواريخ الحجوزات
-            flatpickr("#formAppDate", {
-                dateFormat: "Y-m-d",
-                altInput: true,
-                altFormat: "d/m/Y",
-                disableMobile: true,
-                dir: "rtl"
-            });
-
-            flatpickr("#filterUpcomingDate", {
-                dateFormat: "Y-m-d",
-                altInput: true,
-                altFormat: "d/m/Y",
-                disableMobile: true,
-                dir: "rtl"
-            });
+            flatpickr("#formAppDate", commonDateOptions);
+            flatpickr("#filterUpcomingDate", commonDateOptions);
 
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.addEventListener('click', (e) => {
@@ -1016,6 +1006,11 @@
                     closeModal('patientModal');
                     loadDashboardData(); // تحديث الجدول فوراً
                 } catch (error) {
+                    // إظهار سبب المنع الحقيقي من فايربيز في رسالة تنبيه واضحة
+                    alert("فشل الحذف من السيرفر!
+السبب الفني: " + error.message + "
+
+(إذا كانت الرسالة تحتوي على permission denied فهذا يعني أن Firebase Rules تمنع الحذف ويجب تعديلها من لوحة تحكم فايربيز).");
                     showToast("حدث خطأ في الاتصال بقاعدة البيانات", "error");
                     console.error("Delete Error:", error);
                 }
