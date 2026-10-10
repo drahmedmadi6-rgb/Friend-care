@@ -552,7 +552,7 @@
          ========================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where, doc, getDoc, updateDoc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, doc, getDoc, updateDoc, deleteDoc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDJ2PMemkLDrVWS2PMH9z7glG-yK0QDNsg",
@@ -635,6 +635,28 @@
             }
             return `<span class="badge ${cssClass}">${status}</span>`;
         }
+        // حساب العمر الدقيق لطب الأطفال (سنوات، شهور، أيام)
+        function getExactAge(dobString) {
+            if (!dobString) return 'غير محدد';
+            const birthDate = new Date(dobString);
+            const today = new Date();
+            let years = today.getFullYear() - birthDate.getFullYear();
+            let months = today.getMonth() - birthDate.getMonth();
+            let days = today.getDate() - birthDate.getDate();
+
+            if (days < 0) {
+                months--;
+                days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+            }
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            if (years === 0 && months === 0) return `${days} يوم`;
+            if (years === 0) return `${months} شهر و ${days} يوم`;
+            return `${years} سنة و ${months} شهر`;
+        }
 
         function getTodayStr() {
             const d = new Date();
@@ -665,6 +687,8 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             let currentFormPatient = null;
+            // تقييد تقويم الموبايل لمنع اختيار تاريخ ميلاد في المستقبل
+            document.getElementById('formDOB').max = getTodayStr();
 
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.addEventListener('click', (e) => {
@@ -800,12 +824,19 @@
                     document.getElementById('dashTodayCount').innerText = total;
                     document.getElementById('dashWaitingCount').innerText = waiting;
 
-                    // رسم الجدول إذا كانت صفحة الإدارة مفتوحة
-                    apps.sort((a,b) => a.time.localeCompare(b.time)).forEach(app => {
-                        tbody.innerHTML += `<tr>
+                    // رسم الجدول مع الترتيب الذكي (الانتظار أولاً، ثم المكتمل في النهاية)
+                    apps.sort((a, b) => {
+                        if (a.status === 'Completed' && b.status !== 'Completed') return 1;
+                        if (a.status !== 'Completed' && b.status === 'Completed') return -1;
+                        return a.time.localeCompare(b.time); // ترتيب بالوقت لباقي الحالات
+                    }).forEach(app => {
+                        const isCompleted = app.status === 'Completed';
+                        const rowStyle = isCompleted ? 'opacity: 0.6; background-color: #f8fafc;' : '';
+                        
+                        tbody.innerHTML += `<tr style="${rowStyle}">
                             <td><strong style="color:var(--primary)">${app.time}</strong></td>
                             <td><span class="mrn-text">${app.mrn}</span></td>
-                            <td style="font-weight: 700;">${app.patientName}</td>
+                            <td style="font-weight: 700; ${isCompleted ? 'text-decoration: line-through; color: var(--text-muted);' : ''}">${app.patientName}</td>
                             <td>${renderBadge(app.status)}</td>
                             <td>
                                 <button class="btn-secondary btn-small" onclick="window.viewPatient('${app.patientId}')" style="min-width:auto; padding:8px 12px;"><i class="fa-solid fa-folder-open"></i></button>
@@ -893,11 +924,18 @@
                     const snap = await getDoc(doc(db, COL_PATIENTS, patientId));
                     if(snap.exists()) {
                         const patient = snap.data();
+                        const exactAge = getExactAge(patient.dob);
                         document.getElementById('modalPatientInfo').innerHTML = `
                             <div class="form-group"><label>اسم المريض</label><input type="text" readonly value="${patient.fullName}"></div>
                             <div class="form-group"><label>رقم الملف (MRN)</label><input type="text" readonly value="${patient.mrn}" class="mrn-text" style="text-align: center;"></div>
                             <div class="form-group"><label>هاتف التواصل</label><input type="text" readonly value="${patient.phone}"></div>
-                            <div class="form-group"><label>تاريخ الميلاد</label><input type="text" readonly value="${patient.dob}"></div>
+                            <div class="form-group"><label>العمر الفعلي</label><input type="text" readonly value="${exactAge} (مواليد: ${patient.dob})"></div>
+                            
+                            <div class="form-group full-width mt-10">
+                                <button type="button" class="btn-primary" style="background-color: var(--danger); width: 100%;" onclick="window.deletePatientCompletely('${patient.id}')">
+                                    <i class="fa-solid fa-trash-can"></i> حذف السجل الطبي بالكامل
+                                </button>
+                            </div>
                         `;
                         const hq = query(collection(db, COL_APPS), where("patientId", "==", patientId));
                         const hSnap = await getDocs(hq);
@@ -917,6 +955,32 @@
                         setTimeout(() => modal.classList.add('show'), 10);
                     }
                 } catch(e) {}
+                hideLoading();
+            };
+            // وظيفة الحذف النهائي للمريض وجميع حجوزاته (لإزالة بيانات الاختبار)
+            window.deletePatientCompletely = async (patientId) => {
+                const confirmMsg = "⚠️ تحذير خطير!\nهل أنت متأكد من حذف هذا المريض نهائياً؟\nسيؤدي هذا إلى حذف المريض وجميع حجوزاته المرتبطة ولن يمكنك التراجع.";
+                if (!confirm(confirmMsg)) return;
+
+                showLoading("جاري الحذف النهائي...");
+                try {
+                    // 1. البحث عن جميع حجوزات المريض وحذفها
+                    const qApps = query(collection(db, COL_APPS), where("patientId", "==", patientId));
+                    const snapApps = await getDocs(qApps);
+                    snapApps.forEach(async (appDoc) => {
+                        await deleteDoc(doc(db, COL_APPS, appDoc.id));
+                    });
+
+                    // 2. حذف ملف المريض الأساسي
+                    await deleteDoc(doc(db, COL_PATIENTS, patientId));
+
+                    showToast("تم حذف المريض وجميع سجلاته بنجاح");
+                    closeModal('patientModal');
+                    loadDashboardData(); // تحديث الجدول فوراً
+                } catch (error) {
+                    showToast("فشل الحذف، يرجى المحاولة لاحقاً", "error");
+                    console.error("Delete Error:", error);
+                }
                 hideLoading();
             };
 
