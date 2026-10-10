@@ -873,10 +873,11 @@
                             <div class="form-group"><label>العمر الفعلي</label><input type="text" readonly value="${exactAge} (مواليد: ${patient.dob})"></div>
                             
                             <div class="form-group full-width mt-10">
-                                <button type="button" class="btn-primary" style="background-color: var(--danger); width: 100%;" onclick="window.deletePatientCompletely('${patient.id}')">
+                                <button type="button" class="btn-primary" style="background-color: var(--danger); width: 100%;" onclick="window.deletePatientCompletely('${patientId}')">
                                     <i class="fa-solid fa-trash-can"></i> حذف السجل الطبي بالكامل
                                 </button>
                             </div>
+
                         `;
                         const hq = query(collection(db, COL_APPS), where("patientId", "==", patientId));
                         const hSnap = await getDocs(hq);
