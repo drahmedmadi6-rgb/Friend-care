@@ -694,9 +694,14 @@
         document.addEventListener("DOMContentLoaded", () => {
             let currentFormPatient = null;
 
+            // تفعيل اللغة العربية بشكل عام لجميع التقويمات
+            if (typeof flatpickr !== 'undefined' && flatpickr.l10ns && flatpickr.l10ns.ar) {
+                flatpickr.localize(flatpickr.l10ns.ar);
+            }
+
             // إعدادات التقويم العربي الموحدة لجميع الحقول (لإجبار الموبايل على العربي)
             const commonDateOptions = {
-                locale: "ar",           // إجبار التقويم على اللغة العربية بشكل مباشر
+                locale: (typeof flatpickr !== 'undefined' && flatpickr.l10ns) ? flatpickr.l10ns.ar : "ar",
                 dateFormat: "Y-m-d",    // الصيغة البرمجية للحفظ
                 altInput: true,         // إظهار حقل بديل منسق للمستخدم
                 altFormat: "d/m/Y",     // صيغة العرض (يوم/شهر/سنة)
